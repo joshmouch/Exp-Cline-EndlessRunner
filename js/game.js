@@ -49,20 +49,44 @@ class Game {
         // Load all textures
         this.textures = {
             road: textureLoader.load('assets/images/road_texture-1.png'),
-            grass: textureLoader.load('assets/images/grass_texture-1.png'),
-            bark: textureLoader.load('assets/images/bark_texture-1.png'),
-            leaves: textureLoader.load('assets/images/leaves_texture-1.png'),
+            grass: [
+                textureLoader.load('assets/images/grass_texture-1.png'),
+                textureLoader.load('assets/images/grass_texture-2-1.png')
+            ],
+            bark: [
+                textureLoader.load('assets/images/bark_texture-1.png'),
+                textureLoader.load('assets/images/bark_texture-2-1.png')
+            ],
+            leaves: [
+                textureLoader.load('assets/images/leaves_texture-1.png'),
+                textureLoader.load('assets/images/leaves_texture-2-1.png')
+            ],
             rock: textureLoader.load('assets/images/rock_texture-1.png'),
             log: textureLoader.load('assets/images/log_texture-1.png'),
-            sky: textureLoader.load('assets/images/sky_texture-1.png')
+            sky: [
+                textureLoader.load('assets/images/sky_texture-1.png'),
+                textureLoader.load('assets/images/sky_texture-2-1.png')
+            ]
         };
         
         // Set texture properties for all textures
-        Object.values(this.textures).forEach(texture => {
+        const setTextureProperties = (texture) => {
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
             texture.repeat.set(1, 1);
+        };
+        
+        // Apply to all textures, including arrays of textures
+        Object.values(this.textures).forEach(texture => {
+            if (Array.isArray(texture)) {
+                texture.forEach(setTextureProperties);
+            } else {
+                setTextureProperties(texture);
+            }
         });
+        
+        // Set the sky texture to the new one
+        this.currentSkyTexture = this.textures.sky[1];
     }
     
     /**
@@ -75,7 +99,7 @@ class Game {
         // Set sky background with texture
         const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
         const skyMaterial = new THREE.MeshBasicMaterial({
-            map: this.textures.sky,
+            map: this.currentSkyTexture,
             side: THREE.BackSide
         });
         const sky = new THREE.Mesh(skyGeometry, skyMaterial);
@@ -199,17 +223,27 @@ class Game {
      * @param {KeyboardEvent} event Keyboard event
      */
     handleKeyDown(event) {
-        // Jump when space is pressed
-        if (event.code === 'Space') {
-            if (this.state === 'playing') {
+        if (this.state === 'playing') {
+            // Jump when space or up arrow is pressed
+            if (event.code === 'Space' || event.code === 'ArrowUp') {
                 this.player.jump();
-            } else if (this.state === 'start') {
-                this.startGame();
-            } else if (this.state === 'gameOver') {
-                this.restartGame();
+                event.preventDefault();
             }
-            
-            // Prevent default space bar behavior (page scrolling)
+            // Move left
+            else if (event.code === 'ArrowLeft') {
+                this.player.moveLeft();
+                event.preventDefault();
+            }
+            // Move right
+            else if (event.code === 'ArrowRight') {
+                this.player.moveRight();
+                event.preventDefault();
+            }
+        } else if (this.state === 'start' && event.code === 'Space') {
+            this.startGame();
+            event.preventDefault();
+        } else if (this.state === 'gameOver' && event.code === 'Space') {
+            this.restartGame();
             event.preventDefault();
         }
     }

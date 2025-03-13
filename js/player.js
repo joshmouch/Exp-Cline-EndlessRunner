@@ -15,6 +15,8 @@ class Player {
         this.jumpForce = 0.15;
         this.gravity = 0.005;
         this.jumpHeight = 2;
+        this.lateralSpeed = 0.3;
+        this.maxLateralPosition = 3; // Maximum distance from center
         
         // Player position
         this.position = {
@@ -174,8 +176,25 @@ class Player {
             this.animateRunning();
         }
         
+        // Gradually return to center when not actively moving
+        this.returnToCenter();
+        
         // Update collider
         this.updateCollider();
+    }
+    
+    /**
+     * Gradually return player to center and upright position
+     */
+    returnToCenter() {
+        // Return rotation to neutral
+        if (this.mesh.rotation.z > 0.01) {
+            this.mesh.rotation.z -= 0.01;
+        } else if (this.mesh.rotation.z < -0.01) {
+            this.mesh.rotation.z += 0.01;
+        } else {
+            this.mesh.rotation.z = 0;
+        }
     }
     
     /**
@@ -200,12 +219,39 @@ class Player {
     }
     
     /**
+     * Move player to the left
+     */
+    moveLeft() {
+        // Only move if not at the left edge
+        if (this.mesh.position.x > -this.maxLateralPosition) {
+            this.mesh.position.x -= this.lateralSpeed;
+            // Tilt the player slightly when moving
+            this.mesh.rotation.z = Math.min(this.mesh.rotation.z + 0.05, 0.2);
+            this.updateCollider();
+        }
+    }
+    
+    /**
+     * Move player to the right
+     */
+    moveRight() {
+        // Only move if not at the right edge
+        if (this.mesh.position.x < this.maxLateralPosition) {
+            this.mesh.position.x += this.lateralSpeed;
+            // Tilt the player slightly when moving
+            this.mesh.rotation.z = Math.max(this.mesh.rotation.z - 0.05, -0.2);
+            this.updateCollider();
+        }
+    }
+    
+    /**
      * Reset player to initial state
      */
     reset() {
         this.isJumping = false;
         this.isFalling = false;
         this.mesh.position.set(this.position.x, this.position.y, this.position.z);
+        this.mesh.rotation.z = 0; // Reset rotation
         this.updateCollider();
     }
 }

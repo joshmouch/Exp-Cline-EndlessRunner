@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Endless Runner</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -32,13 +35,17 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/TextureLoader.js"></script>
 
-    <!-- Game scripts -->
-    <script src="js/score.js"></script>
-    <script src="js/collision.js"></script>
-    <script src="js/player.js"></script>
-    <script src="js/obstacles.js"></script>
-    <script src="js/environment.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Game scripts with cache busting -->
+    <script>
+        // Add random number to force cache refresh
+        const cacheBuster = Math.floor(Math.random() * 1000000);
+    </script>
+    <script src="js/score.js?v=nocache"></script>
+    <script src="js/collision.js?v=nocache"></script>
+    <script src="js/player.js?v=nocache"></script>
+    <script src="js/obstacles.js?v=nocache"></script>
+    <script src="js/environment.js?v=nocache"></script>
+    <script src="js/game.js?v=nocache"></script>
+    <script src="js/main.js?v=nocache"></script>
 </body>
 </html>
